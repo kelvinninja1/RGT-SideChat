@@ -1,6 +1,6 @@
-### Interview Assignment
-In this assignment, you are to create a live instant messaging application, with authorization,
-and a simple frontend client.
+# Interview Assignment
+### In this assignment, you are to create a live instant messaging application, with authorization, and a simple frontend client.
+
 ## App Specification
 
 The app is a single page, and contains a few sections:
@@ -18,7 +18,7 @@ The app is a single page, and contains a few sections:
 5. If I have no open windows for the app, I should disappear from the list
 6. If I have multiple windows open for the app, the state should be the EXACT same for
    each
-   Technical Requirements:
+   ### Technical Requirements:
    ● Use Node.js + Typescript (with any library/framework) for the API
    ● Use Auth0 for authentication (or any other EXTERNAL Auth provider, DO NOT
    implement your own auth).
