@@ -1,36 +1,26 @@
 import type { NextPage } from 'next'
 import Head from 'next/head'
 import Image from 'next/image'
-import Profile from "../components/profile";
+import { useUser } from '@auth0/nextjs-auth0';
+import React from "react";
+import ChatScreen from "../components/ChatScreen";
+import LoginScreen from "../components/LoginScreen";
 
 const Home: NextPage = () => {
+  const { user, error, isLoading } = useUser();
+
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>{error.message}</div>;
+
   return (
     <div className="flex min-h-screen flex-col items-center justify-center py-2">
       <Head>
-        <title>RGT SideChat</title>
+        <title>SideChat</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main className="flex w-full flex-1 flex-col items-center justify-center px-20 text-center">
-        <h1 className="text-6xl font-bold">
-          Chat Really great Strangers with{' '}
-          <a className="text-blue-600" href="https://nextjs.org">
-            SideChat
-          </a>
-        </h1>
+        {(user) ? (<ChatScreen />) : (<LoginScreen />)}
 
-        <p className="mt-3 text-2xl">
-          Wait a minute who are you?{' '}
-          <a  href="/api/auth/login" className="rounded-md bg-blue-600 p-3 font-bold text-lg">
-            login
-          </a>
-          <a  href="/api/auth/logout" className="rounded-md bg-blue-600 p-3 font-bold text-lg">
-            logout
-          </a>
-        </p>
-
-          <Profile />
-      </main>
 
       <footer className="flex h-24 w-full items-center justify-center border-t">
         <a
