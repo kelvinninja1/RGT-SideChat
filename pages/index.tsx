@@ -1,38 +1,24 @@
 import type { NextPage } from 'next'
 import Head from 'next/head'
-import Image from 'next/image'
-import { useUser } from '@auth0/nextjs-auth0';
-import React from "react";
-import ChatScreen from "../components/ChatScreen";
-import LoginScreen from "../components/LoginScreen";
+import { useUser } from '@auth0/nextjs-auth0'
+import React from 'react'
+import ChatScreen from '../components/ChatScreen'
+import LoginScreen from '../components/LoginScreen'
 
 const Home: NextPage = () => {
-  const { user, error, isLoading } = useUser();
+  const { user, error, isLoading } = useUser()
 
-  if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>{error.message}</div>;
+  if (isLoading) return <div>Loading...</div>
+  if (error) return <div>{error.message}</div>
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center py-2">
+    <div className="flex flex-col p-2">
       <Head>
         <title>SideChat</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-        {(user) ? (<ChatScreen />) : (<LoginScreen />)}
-
-
-      <footer className="flex h-24 w-full items-center justify-center border-t">
-        <a
-          className="flex items-center justify-center gap-2"
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <Image src="/vercel.svg" alt="Vercel Logo" width={72} height={16} />
-        </a>
-      </footer>
+      {user ? <ChatScreen /> : <LoginScreen />}
     </div>
   )
 }
