@@ -1,12 +1,21 @@
 import type { NextPage } from 'next'
 import Head from 'next/head'
 import { useUser } from '@auth0/nextjs-auth0'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import ChatScreen from '../components/ChatScreen'
 import LoginScreen from '../components/LoginScreen'
+import io from 'socket.io-client'
 
 const Home: NextPage = () => {
   const { user, error, isLoading } = useUser()
+  const [hello, setHello] = useState('')
+
+  useEffect(() => {
+    const socket = io({ ['transports']: ['websocket'] })
+    socket.on('now', (data) => {
+      setHello(data.message)
+    })
+  }, [])
 
   if (isLoading) return <div>Loading...</div>
   if (error) return <div>{error.message}</div>
@@ -19,6 +28,7 @@ const Home: NextPage = () => {
       </Head>
 
       {user ? <ChatScreen /> : <LoginScreen />}
+      {hello}
     </div>
   )
 }

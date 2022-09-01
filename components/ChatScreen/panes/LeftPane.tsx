@@ -1,27 +1,47 @@
 import React, { useEffect, useState } from 'react'
 import { useUser } from '@auth0/nextjs-auth0'
-import io from 'socket.io-client'
+import { OnlineUser } from '../../../types'
 
-type OnlineUser = {
-  email: string | undefined
-  name: string | undefined
-  picture: string | undefined
-}
-
-export default function LeftPane() {
+export default function LeftPane({
+  onlineUsers,
+  selectedUser,
+  setSelectedUser,
+}: {
+  onlineUsers: OnlineUser[]
+  selectedUser: OnlineUser | null
+  setSelectedUser: (user: OnlineUser) => void
+}) {
   const { user, error, isLoading } = useUser()
-  const [onlineUsers, setOnlineUsers] = useState([])
-  useEffect(() => {
-    if (user) {
-      fetch('/api/online').finally(() => {
-        const socket = io()
+  const [availableUsers, setAvailableUsers] = useState<OnlineUser[]>([])
 
-        socket.on('online', (data) => {
-          setOnlineUsers(data)
-        })
-      })
+  useEffect(() => {
+    // filter out online users in blockedUsers list
+    if (user && user.email) {
+      const avail = async () =>
+        onlineUsers.filter(
+          (onlineUser) =>
+            !onlineUser?.preferences?.blockedUsers.includes(
+              user.email as string
+            )
+        )
+      avail().then((onlineUsers) => setAvailableUsers(onlineUsers))
+
+      // Compare online users and available users in a console table
+      console.log('Unfiltered Online user: ')
+      console.table(onlineUsers)
+      console.log('Filtered Available user: ')
+      console.table(availableUsers)
     }
-  }, [])
+  }, [onlineUsers])
+
+  const fetchUsers = async (user: any) => {
+    setAvailableUsers(
+      onlineUsers.filter(
+        (onlineUser) =>
+          !onlineUser?.preferences?.blockedUsers.includes(user.email as string)
+      )
+    )
+  }
 
   if (isLoading) return <div>Loading...</div>
   if (error) return <div>{error.message}</div>
@@ -57,23 +77,48 @@ export default function LeftPane() {
         <div className="border-t-gray-500 pt-5">
           <h3 className="font-bold">Online Users</h3>
           <ul>
-            {onlineUsers.length > 0 ? (
-              onlineUsers.map(
+            {availableUsers.length > 0 ? (
+              availableUsers.map(
                 (
-                  onlineUser: OnlineUser,
+                  availableUser: OnlineUser,
                   index: React.Key | null | undefined
                 ) => {
                   return (
-                    <li key={index}>
+                    <li
+                      key={index}
+                      onClick={() => {
+                        setSelectedUser(availableUser)
+                      }}
+                      className={
+                        selectedUser?.email === availableUser.email
+                          ? 'bg-gray-200'
+                          : '' +
+                            ' cursor-pointer' +
+                            ' py-2 px-4' +
+                            ' hover:bg-gray-100' +
+                            ' rounded-md' +
+                            ' text-sm' +
+                            ' text-gray-700' +
+                            ' font-semibold' +
+                            ' hover:text-gray-900' +
+                            ' hover:font-bold' +
+                            ' focus:outline-none' +
+                            ' focus:text-gray-900' +
+                            ' focus:font-bold' +
+                            ' focus:bg-gray-100' +
+                            ' focus:outline-none' +
+                            ' focus:bg-gray-200'
+                      }
+                    >
                       <div className="flex items-center">
                         <img
-                          src={onlineUser.picture as string}
-                          alt={onlineUser.name as string}
+                          src={availableUser.picture as string}
+                          alt={availableUser.name as string}
                           className="mr-4 h-10 w-10 rounded-full"
                         />
                         <div className="flex-1">
-                          <h4 className="font-bold">{onlineUser.name}</h4>
-                          <p className="text-sm">{onlineUser.email}</p>
+                          <h4 className="font-bold">{availableUser.name}</h4>
+                          <p className="text-sm">{availableUser.email}</p>
                         </div>
                       </div>
                     </li>
@@ -81,7 +126,7 @@ export default function LeftPane() {
                 }
               )
             ) : (
-              <li className="text-red-400">No users online</li>
+              <li className="text-red-400">Awaiting awesome users online</li>
             )}
           </ul>
         </div>
